@@ -1,21 +1,24 @@
 import React, { useState, useEffect, useRef } from 'react';
-import countriesData from '../countriesdata';
+import { GoogleLogin } from '@react-oauth/google';
+import countriesData from '../countriesdata'; // Make sure this path is correct
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSearch, faMicrophone, faCamera } from '@fortawesome/free-solid-svg-icons';
-import './SearchBar.css'; 
+import './SearchBar.css'; // Import your styling
 
 const SearchBar = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [filteredCountries, setFilteredCountries] = useState([]);
-  const searchRef = useRef(null);
+  const [showResults, setShowResults] = useState(false); // Manage the visibility of results
+  const resultsRef = useRef(null); // Reference to the results container
 
   useEffect(() => {
+    // Close results when clicking outside
     const handleClickOutside = (event) => {
-      if (searchRef.current && !searchRef.current.contains(event.target)) {
-        setFilteredCountries([]);
+      if (resultsRef.current && !resultsRef.current.contains(event.target)) {
+        setShowResults(false);
       }
     };
-
+    
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
@@ -28,12 +31,23 @@ const SearchBar = () => {
       country.country.toLowerCase().startsWith(value) ||
       country.capital.toLowerCase().startsWith(value)
     );
+    
     setFilteredCountries(filtered);
+    setShowResults(value.length > 0); // Show results if there is input
+  };
+
+  const handleLoginSuccess = (response) => {
+    console.log('Login Success:', response);
+    // Handle successful login
+  };
+
+  const handleLoginError = (error) => {
+    console.error('Login Failed:', error);
+    // Handle failed login
   };
 
   return (
-    <div className="search-bar-wrapper" ref={searchRef}>
-     
+    <div className="search-bar-wrapper">
       <div className="search-bar-container">
         <FontAwesomeIcon icon={faSearch} className="icon search-icon" />
         <input
@@ -47,16 +61,30 @@ const SearchBar = () => {
         <FontAwesomeIcon icon={faCamera} className="icon photo-scan-icon" />
       </div>
 
-      
-      {filteredCountries.length > 0 && (
-        <div className="results-container">
-          {filteredCountries.map((country, index) => (
-            <div key={index} className="result-item">
-              {country.country} - {country.capital}
-            </div>
-          ))}
+      {/* Display Results Below the Search Bar */}
+      {showResults && (
+        <div className="results-container" ref={resultsRef}>
+          {filteredCountries.length > 0 ? (
+            <ul className="list-group">
+              {filteredCountries.map((country, index) => (
+                <li key={index} className="list-group-item">
+                  {country.country} - {country.capital}
+                </li>
+              ))}
+            </ul>
+          ) : (
+            searchTerm && <p className="no-results">No results found</p>
+          )}
         </div>
       )}
+
+      {/* Google Login Button */}
+      <div className="google-login-container">
+        <GoogleLogin
+          onSuccess={handleLoginSuccess}
+          onError={handleLoginError}
+        />
+      </div>
     </div>
   );
 };

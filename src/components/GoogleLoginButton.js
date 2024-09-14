@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { GoogleLogin } from 'react-google-login';
+import { GoogleOAuthProvider, GoogleLogin } from '@react-oauth/google';
 
 const GoogleLoginButton = () => {
   const handleSuccess = (response) => {

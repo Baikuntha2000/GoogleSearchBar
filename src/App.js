@@ -3,17 +3,18 @@ import './App.css';
 
 
 import React from 'react';
+import { GoogleOAuthProvider } from '@react-oauth/google';
 import SearchBar from './components/SearchBar';
-import GoogleLoginButton from './components/GoogleLoginButton';
-import 'bootstrap/dist/css/bootstrap.min.css';
 
-function App() {
+const App = () => {
   return (
-    <div className="container mt-5">
-      <GoogleLoginButton />
-      <SearchBar />
-    </div>
+    <GoogleOAuthProvider clientId="YOUR_CLIENT_ID">
+      <div className="App">
+        <SearchBar />
+      </div>
+    </GoogleOAuthProvider>
   );
-}
+};
 
 export default App;
+
